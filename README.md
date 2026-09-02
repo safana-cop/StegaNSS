@@ -51,6 +51,20 @@ StegaNSS/
 ├── style.css
 ├── script.js
 └── logo.png
+
+## 🎯 Objective
+
+The objective of StegaNSS is to provide a user-friendly platform for securely hiding and extracting confidential information using multimedia steganography techniques.
+
+## 🔮 Future Enhancements
+
+- Improved encryption and security
+- Support for larger multimedia files
+- Advanced steganalysis detection
+- Cloud-based secure storage
+- Enhanced authentication
+- Deployment as a web application
+
 ## ⚙️ Installation
 
 ### 1. Clone the repository
