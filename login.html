@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 
+        stegaNSS Authentication Gateway
+        Operative Access Point for Secure Environments
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stegaNSS | Operative Hub</title>
+
+    <!-- External Dependencies: Fonts & Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 1. Authentication Layer Styling (Critical Path) -->
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #020617;
+            overflow: hidden;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            z-index: 10;
+        }
+
+        .hub-logo {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            background: linear-gradient(135deg, #f8fafc 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-weight: 600;
+        }
+
+        .glass-box {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 4rem;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .orb {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            filter: blur(40px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #orb1 {
+            top: -100px;
+            left: -100px;
+            animation: float 12s infinite alternate;
+        }
+
+        #orb2 {
+            bottom: -100px;
+            right: -100px;
+            animation: float 8s infinite alternate-reverse;
+        }
+
+        input {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            font-size: 0.9rem;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+            color: #fff;
+        }
+
+        input:focus {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px var(--accent-glow);
+            outline: none;
+        }
+
+        .btn-hub {
+            width: 100%;
+            padding: 1.25rem;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 2rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-hub:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+    </style>
+</head>
+
+<body class="dark-theme">
+    <!-- Ambient Background Substrate -->
+    <div class="orb" id="orb1"></div>
+    <div class="orb" id="orb2"></div>
+
+    <div class="login-container">
+        <!-- 2. Hub Branding -->
+        <div class="hub-logo">
+            <div class="logo-main">stegaNSS</div>
+            <div class="logo-sub">stegaNSS Center</div>
+        </div>
+
+        <!-- 3. Operative Credentials Interface -->
+        <div class="glass-box">
+            <form method="POST">
+                <!-- Username Component -->
+                <div class="form-group" style="text-align: left; margin-bottom: 2rem;">
+                    <label
+                        style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 700;">Operative
+                        ID</label>
+                    <input type="text" name="username" placeholder="Identification..." required>
+                </div>
+
+                <!-- Password Component with Visibility Toggle -->
+                <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+                    <label
+                        style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 700;">Access
+                        Key</label>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="passInput" placeholder="Security Signature..."
+                            required>
+                        <i class="fas fa-fingerprint" onclick="togglePass('passInput')"
+                            style="position: absolute; right: 1.25rem; top: 1.15rem; cursor: pointer; color: var(--accent-primary); font-size: 1.2rem;"></i>
+                    </div>
+                </div>
+
+                <!-- Submission Trigger -->
+                <button type="submit" class="btn-hub">
+                    Authenticate
+                </button>
+            </form>
+
+            <!-- Onboarding Redirection -->
+            <div
+                style="margin-top: 3rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); letter-spacing: 1px;">
+                    New Operative? <a href="/register"
+                        style="color: var(--accent-primary); text-decoration: none; font-weight: 700;">Establish
+                        Connection</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Logic Protocols (Scripts) -->
+    <script>
+        /**
+         * togglePass
+         * Securely toggles visibility of the access key input field
+         */
+        function togglePass(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace('fa-fingerprint', 'fa-eye');
+            } else {
+                input.type = "password";
+                icon.classList.replace('fa-eye', 'fa-fingerprint');
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="glass-panel ultra-glass" style="padding: 6rem 4rem; border-radius: 40px; max-width: 900px; margin: 0 auto;">
+    <!-- 1. Forensic Header -->
+    <div style="text-align: center; margin-bottom: 5rem;">
+        <h1 style="color: var(--accent-primary); font-size: 3.5rem; letter-spacing: -2px;">Intelligence <span
+                style="color: #fff;">Extracting</span></h1>
+        <p
+            style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">
+            Analyze stego file and reconstruct hidden steganographic layers.
+        </p>
+    </div>
+
+    <!-- 2. Extraction Configuration -->
+    <form method="POST" enctype="multipart/form-data" id="extractForm"
+        style="display: flex; flex-direction: column; gap: 2.5rem;">
+        <input type="hidden" name="media" value="{{ media }}">
+
+        <div class="form-group">
+            <label
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; display: block;">Upload
+                Stego File ({{ media|upper }})</label>
+            <input type="file" name="file" id="fileInput" required onchange="analyzeFile()"
+                style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; display: block;">Decryption
+                Key</label>
+            <input type="password" name="pin" placeholder="Enter security signature for extraction..." required
+                style="background: rgba(0,0,0,0.2); border-radius: 16px;">
+        </div>
+
+        <button type="submit" class="btn-primary"
+            style="padding: 1.25rem; border-radius: 18px; font-size: 1.1rem; margin-top: 1rem;">
+            <i class="fas fa-unlock-keyhole"></i> Start Extraction
+        </button>
+    </form>
+
+    <!-- 3. Dynamic Result Display -->
+    {% if msg %}
+    <div
+        style="margin-top: 5rem; padding: 4rem; border: 1px solid {% if success %}var(--accent-primary){% else %}#ef4444{% endif %}; background: rgba(0,0,0,0.05); border-radius: 32px; position: relative; overflow: hidden;">
+        {% if success %}
+        <div
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--accent-primary), transparent); animation: accentPulse 2s infinite;">
+        </div>
+        {% endif %}
+
+        <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2.5rem;">
+            <i class="fas {% if success %}fa-circle-check{% else %}fa-circle-xmark{% endif %}"
+                style="font-size: 3.5rem; color: {% if success %}var(--accent-primary){% else %}#ef4444{% endif %}; filter: drop-shadow(0 0 15px {% if success %}var(--accent-glow){% else %}rgba(239, 68, 68, 0.4){% endif %});"></i>
+            <div>
+                <h3
+                    style="color: {% if success %}var(--accent-primary){% else %}#ef4444{% endif %}; text-transform: uppercase; letter-spacing: 3px; margin: 0; font-size: 1.4rem;">
+                    {% if success %}Decryption Successful{% else %}Access Denied{% endif %}
+                </h3>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem;">
+                </p>
+            </div>
+        </div>
+
+        <div
+            style="background: rgba(0,0,0,0.3); padding: 2.5rem; border-radius: 20px; border: 1px solid var(--glass-border); position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+            <p
+                style="color: #fff; font-size: 1.15rem; line-height: 1.8; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px;">
+                {{ msg }}</p>
+            <i class="fas fa-quote-right"
+                style="position: absolute; bottom: 1.5rem; right: 1.5rem; opacity: 0.1; font-size: 2.5rem; color: var(--accent-primary);"></i>
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 5rem; text-align: center;">
+        <a href="/select_extract"
+            style="color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+            <i class="fas fa-arrow-left" style="margin-right: 12px; color: var(--accent-primary);"></i> Change Media
+        </a>
+    </div>
+</div>
+
+<script>
+    async function analyzeFile() {
+        const fileInput = document.getElementById('fileInput');
+        if (!fileInput.files[0]) return;
+
+        const overlay = document.getElementById('scanOverlay');
+        const metrics = document.getElementById('securityMetrics');
+        const bar = document.getElementById('suspicionBar');
+        const score = document.getElementById('suspicionScore');
+        const note = document.getElementById('securityNote');
+
+        overlay.style.display = 'flex';
+
+        const fData = new FormData();
+        fData.append('file', fileInput.files[0]);
+
+        try {
+            const resp = await fetch('/api/analyze', { method: 'POST', body: fData });
+            const data = await resp.json();
+
+            overlay.style.display = 'none';
+            metrics.style.display = 'block';
+
+            if (data.success) {
+                const s = Math.round(data.score);
+                bar.style.width = s + '%';
+                score.innerText = s + '%';
+
+                if (s > 80) {
+                    note.innerText = 'CRITICAL: High probability of steganographic signature detected.';
+                    bar.style.background = '#ef4444';
+                } else if (s > 40) {
+                    note.innerText = 'WARNING: Minor LSB anomalies detected. Carrier potentially tampered.';
+                    bar.style.background = '#f59e0b';
+                } else {
+                    note.innerText = 'STABLE: No significant cryptographic mutations discovered.';
+                    bar.style.background = 'var(--accent-primary)';
+                }
+            }
+        } catch (e) {
+            overlay.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

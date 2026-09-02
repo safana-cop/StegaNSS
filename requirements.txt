@@ -1,0 +1,7 @@
+Flask
+gunicorn
+opencv-python
+numpy
+Pillow
+cryptography
+google-auth

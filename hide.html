@@ -1,0 +1,358 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- 
+    Secured Deployment Interface
+    Advanced LSB Integration Gateway
+-->
+<div class="glass-panel ultra-glass" style="padding: 6rem 4rem; border-radius: 40px; max-width: 900px; margin: 0 auto;">
+    <!-- 1. Mission Briefing -->
+    <div style="text-align: center; margin-bottom: 5rem;">
+        <h1 style="color: var(--accent-primary); font-size: 3.5rem; letter-spacing: -2px;">Secure <span
+                style="color: #fff;">Hiding</span></h1>
+        <p
+            style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">
+            Embed encrypted secrets into media.
+        </p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="hideForm"
+        style="display: flex; flex-direction: column; gap: 2.5rem;">
+        <input type="hidden" name="media" value="{{ media }}">
+
+        <!-- 2. Carrier Artifact Selection -->
+        <div class="form-group">
+            <label
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; display: block;">Upload
+                file ({{ media|upper }})</label>
+            <div style="position: relative;">
+                <input type="file" name="file" id="carrierInput" required onchange="checkCapacity()"
+                    style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 16px;">
+                <div id="capacityOverlay"
+                    style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--nav-bg); border-radius: 16px; align-items: center; justify-content: center; backdrop-filter: blur(8px); border: 1px solid var(--accent-primary);">
+                    <span
+                        style="color: var(--accent-primary); font-size: 0.8rem; font-weight: 800; letter-spacing: 2px;"><i
+                            class="fas fa-microchip fa-spin" style="margin-right: 12px;"></i>ANALYZING
+                        CAPACITY...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Capacity Meter -->
+        <div id="capacityMeter"
+            style="display: none; padding: 2rem; background: rgba(59, 130, 246, 0.03); border: 1px solid var(--glass-border); border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <span
+                    style="font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase;">Storage
+                    Boundaries</span>
+                <div style="text-align: right;">
+                    <div id="carrierSizeLabel"
+                        style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">
+                        Carrier: 0 KB</div>
+                    <div id="capacityLabel" style="color: var(--accent-primary); font-weight: 800; font-size: 1rem;">0
+                        Bytes Available</div>
+                </div>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                <div id="capacityBar"
+                    style="height: 100%; width: 0%; background: var(--accent-primary); box-shadow: 0 0 15px var(--accent-glow); transition: width 0.3s ease;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Intelligence Payload -->
+        <div class="form-group">
+            <label
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; display: block;">Secret
+                Message</label>
+            <textarea name="secret" id="secretText" placeholder="Enter the classified message for embedding..." required
+                rows="5" oninput="updateUsage()" style="background: rgba(0,0,0,0.2); border-radius: 16px;"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; display: block;">Security
+                Access PIN</label>
+            <div style="position: relative;">
+                <input type="password" name="pin" id="pinInput" placeholder="Set extraction security signature" required
+                    style="background: rgba(0,0,0,0.2); border-radius: 16px;">
+                <i class="fas fa-eye" id="pinToggle" onclick="togglePass('pinInput', 'pinToggle')"
+                    style="position: absolute; right: 1.5rem; top: 1.25rem; cursor: pointer; color: var(--text-muted); font-size: 1rem;"></i>
+            </div>
+        </div>
+
+        <!-- 4. Dual-Deception Protocol -->
+        <div
+            style="padding: 3rem; background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 24px; position: relative; overflow: hidden; transition: var(--transition);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <h3
+                        style="font-size: 0.8rem; letter-spacing: 3px; color: #10b981; text-transform: uppercase; font-weight: 800; margin: 0;">
+                        Dual-Deception Protocol</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="decoyToggleSwitch" onchange="toggleDecoy()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <i class="fas fa-circle-info" style="color: var(--text-muted); cursor: help;"
+                    title="A decoy allows you to hide a second (fake) message to show if you are forced to give up a password."></i>
+            </div>
+
+            <div id="decoyFields"
+                style="display: none; opacity: 0; transition: var(--transition); pointer-events: none;">
+                <div class="form-group">
+                    <label
+                        style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; display: block;">Decoy
+                        Message (Trap Payload)</label>
+                    <textarea name="decoy_secret" id="decoySecret" placeholder="Message for the decoy trap..." rows="2"
+                        style="background: rgba(0,0,0,0.2); border-radius: 12px;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label
+                        style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; display: block;">Decoy
+                        Key</label>
+                    <div style="position: relative;">
+                        <input type="password" name="decoy_pin" id="decoyInput" placeholder="Decoy access password"
+                            style="background: rgba(0,0,0,0.2); border-radius: 12px;">
+                        <i class="fas fa-eye" id="decoyInputToggle"
+                            onclick="togglePass('decoyInput', 'decoyInputToggle')"
+                            style="position: absolute; right: 1.25rem; top: 1.1rem; cursor: pointer; color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submitBtn"
+            style="padding: 1.25rem; border-radius: 18px; font-size: 1.1rem; margin-top: 1rem;">
+            <i class="fas fa-shield-halved" id="submitIcon"></i> <span id="submitText">Execute Security Protocol</span>
+        </button>
+    </form>
+
+    <!-- 5. Mission Result -->
+    {% if stego_file %}
+    <div
+        style="margin-top: 5rem; padding: 4rem; text-align: center; border: 1px solid var(--accent-primary); border-radius: 32px; background: rgba(59, 130, 246, 0.05); position: relative; overflow: hidden;">
+        <i class="fas fa-circle-check"
+            style="font-size: 4rem; color: var(--accent-primary); margin-bottom: 2rem; display: block; filter: drop-shadow(0 0 20px var(--accent-glow));"></i>
+        <h2 style="margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 3px; font-size: 1.5rem;">Operation
+            Successful</h2>
+        <p style="margin-bottom: 3.5rem; color: var(--text-muted); font-size: 1rem;">Encrypted payload integrated into
+            stego file.</p>
+
+        <div style="display: flex; gap: 1.5rem;">
+            <a href="{{ url_for('download', filename=stego_file) }}" class="btn-primary"
+                style="flex: 1; padding: 1rem;">
+                <i class="fas fa-download"></i> Download Stego file
+            </a>
+            <button onclick="visualize()" class="btn-primary"
+                style="flex: 1; padding: 1rem; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary) !important; box-shadow: none;">
+                <i class="fas fa-magnifying-glass-chart"></i> Analyze
+            </button>
+        </div>
+        <input type="hidden" id="orig_name" value="{{ original_file }}">
+        <input type="hidden" id="stego_name" value="{{ stego_file }}">
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 4rem;">
+        <a href="/select_hide"
+            style="color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+            <i class="fas fa-arrow-left" style="color: var(--accent-primary); margin-right: 8px;"></i> Change Media
+        </a>
+    </div>
+</div>
+
+<!-- 6. Operative Visualization Overlay -->
+<div id="vizModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; backdrop-filter: blur(10px);">
+    <div
+        style="background: var(--bg-main); max-width: 1000px; width: 100%; padding: 3rem; border-radius: 32px; border: 1px solid var(--glass-border); position: relative; text-align: center; box-shadow: 0 0 100px rgba(0,0,0,0.5);">
+        <button onclick="closeViz()"
+            style="position: absolute; top: 2rem; right: 2rem; background: var(--accent-soft); border: none; color: var(--accent-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2
+            style="margin-bottom: 2.5rem; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 4px;">
+            Modality Visualization</h2>
+        <div id="vizContent"
+            style="min-height: 400px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed var(--glass-border);">
+        </div>
+    </div>
+</div>
+
+<!-- 7. Protocol Logic (Scripts) -->
+<script>
+    // Handling secure mission deployment state
+    document.getElementById('hideForm').onsubmit = function () {
+        const btn = document.getElementById('submitBtn');
+        const icon = document.getElementById('submitIcon');
+        const text = document.getElementById('submitText');
+
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'wait';
+        icon.className = 'fas fa-cog fa-spin';
+        text.innerText = 'INTEGRATING PAYLOAD... PLEASE WAIT';
+    };
+
+    let maxCapacity = {{ max_capacity|default (0) }};
+
+    function togglePass(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    async function checkCapacity() {
+        const input = document.getElementById('carrierInput');
+        if (!input.files[0]) return;
+
+        const overlay = document.getElementById('capacityOverlay');
+        overlay.style.display = 'flex';
+
+        const decoyEnabled = document.getElementById('decoyToggleSwitch').checked;
+
+        const fData = new FormData();
+        fData.append('file', input.files[0]);
+        fData.append('media', '{{ media }}');
+        fData.append('decoy', decoyEnabled);
+
+        try {
+            const resp = await fetch('/api/capacity', { method: 'POST', body: fData });
+            const data = await resp.json();
+
+            overlay.style.display = 'none';
+            if (data.success) {
+                maxCapacity = data.capacity;
+                document.getElementById('capacityMeter').style.display = 'block';
+                document.getElementById('capacityLabel').innerText = data.capacity_human + " Available";
+                document.getElementById('carrierSizeLabel').innerText = "Carrier Artifact: " + data.carrier_size;
+                updateUsage();
+            }
+        } catch (e) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    function updateUsage() {
+        if (maxCapacity === 0) return;
+        const text = document.getElementById('secretText').value;
+        const usage = text.length;
+        const bar = document.getElementById('capacityBar');
+        const label = document.getElementById('capacityLabel');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const percent = (usage / maxCapacity) * 100;
+
+        // Ensure some visual feedback even for very small messages
+        let visualPercent = percent;
+        if (usage > 0 && percent < 1) visualPercent = 1;
+
+        bar.style.width = Math.min(100, visualPercent) + '%';
+
+        // Show [Used] / [Total] dynamic payload tracking
+        const humanTotal = label.innerText.split(' / ')[1] || label.innerText;
+        label.innerText = `${usage} Bytes / ${humanTotal}`;
+
+        if (percent > 100) {
+            bar.style.background = '#ef4444';
+            bar.style.boxShadow = '0 0 20px #ef4444';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            submitBtn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Payload Boundary Exceeded';
+        } else {
+            bar.style.background = 'var(--accent-primary)';
+            bar.style.boxShadow = '0 0 15px var(--accent-glow)';
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.innerHTML = '<i class="fas fa-shield-halved"></i> Execute Security Protocol';
+        }
+    }
+
+    async function visualize() {
+        const modal = document.getElementById('vizModal');
+        const content = document.getElementById('vizContent');
+        const orig = document.getElementById('orig_name').value;
+        const stego = document.getElementById('stego_name').value;
+
+        modal.style.display = 'flex';
+        content.innerHTML = '<p style="color: var(--accent-primary); letter-spacing: 2px;"><i class="fas fa-sync fa-spin" style="margin-right: 15px;"></i>GENERATING RADIOGRAPH...</p>';
+
+        const fData = new FormData();
+        fData.append('original', orig);
+        fData.append('stego', stego);
+        fData.append('media', '{{ media }}');
+
+        try {
+            const resp = await fetch('/api/visualize', { method: 'POST', body: fData });
+            const result = await resp.json();
+
+            if (result.success) {
+                if (result.type === 'image') {
+                    content.innerHTML = `
+                        <div style="position: relative; width: 100%;">
+                            <img src="data:image/png;base64,${result.data}" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--accent-primary); box-shadow: 0 0 30px var(--accent-glow);">
+                            <div style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px;">${result.note}</div>
+                        </div>`;
+                } else if (result.type === 'audio') {
+                    content.innerHTML = `
+                        <div style="position: relative; width: 100%; padding: 1rem;">
+                            <img src="data:image/png;base64,${result.data}" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--accent-primary); box-shadow: 0 0 30px var(--accent-glow);">
+                            <div style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px;">Signal Integrity Analysis: High-density payload segments identified in the emerald zones.</div>
+                        </div>`;
+                }
+            } else {
+                content.innerHTML = `<p style="color: #ef4444;">${result.error}</p>`;
+            }
+        } catch (e) {
+            content.innerHTML = '<p style="color: #ef4444;">Visualization service offline.</p>';
+        }
+    }
+
+    function closeViz() {
+        document.getElementById('vizModal').style.display = 'none';
+    }
+
+    function toggleDecoy() {
+        const isEnabled = document.getElementById('decoyToggleSwitch').checked;
+        const fields = document.getElementById('decoyFields');
+        const decoySecret = document.getElementById('decoySecret');
+        const decoyInput = document.getElementById('decoyInput');
+
+        if (isEnabled) {
+            fields.style.display = 'block';
+            setTimeout(() => {
+                fields.style.opacity = '1';
+                fields.style.pointerEvents = 'auto';
+            }, 10);
+            decoySecret.disabled = false;
+            decoyInput.disabled = false;
+        } else {
+            fields.style.opacity = '0';
+            fields.style.pointerEvents = 'none';
+            setTimeout(() => {
+                fields.style.display = 'none';
+            }, 400);
+            decoySecret.disabled = true;
+            decoyInput.disabled = true;
+            decoySecret.value = '';
+            decoyInput.value = '';
+        }
+
+        // Re-calculate capacity to reflect the 50/50 layer split
+        checkCapacity();
+    }
+
+    // Initialize security protocols
+    document.addEventListener('DOMContentLoaded', () => {
+        toggleDecoy();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 
+        stegaNSS Security Suite | Core UI Layout
+        Elite Privacy Modality Dashboard
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stegaNSS | Security Suite</title>
+
+    <!-- External Assets: Fonts, Icons, and Theming -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <!-- Critical Theme Handshake -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme') || 'dark-theme';
+            document.documentElement.className = theme;
+        })();
+    </script>
+</head>
+
+<body class="dark-theme">
+
+    <!-- Main Navigation Interface -->
+    <nav class="navbar ultra-glass">
+        <div class="main-container"
+            style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
+            <!-- Brand Identity -->
+            <div class="brand-name" style="color: #fff;">
+                stega<span style="color: var(--accent-primary);">NSS</span>
+            </div>
+
+            <!-- Protocol Gateways -->
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}"
+                    class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
+                <a href="{{ url_for('select_hide') }}" class="{{ 'active' if 'hide' in request.endpoint }}">Hide</a>
+                <a href="{{ url_for('select_extract') }}"
+                    class="{{ 'active' if 'extract' in request.endpoint }}">Extract</a>
+                <a href="{{ url_for('profile') }}" class="{{ 'active' if request.endpoint == 'profile' }}">Profile</a>
+
+            </div>
+
+            <!-- Operative Controls -->
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <!-- Biometric/Session Information -->
+                <div style="text-align: right; margin-right: 0.5rem; display: none;" id="operativeStatus">
+                    <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Operative</div>
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-primary);">{{ session['user']
+                        }}
+                    </div>
+                </div>
+
+                <button id="theme-toggle" class="theme-toggle" title="Toggle Protocol Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <a href="{{ url_for('logout') }}"
+                    style="color: var(--text-muted); font-size: 1.1rem; transition: var(--transition);"
+                    title="Terminate Connection">
+                    <i class="fas fa-power-off"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dynamic Content Hub -->
+    <main class="main-container" style="padding-top: 4rem; padding-bottom: 4rem;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Universal Overlay Components -->
+    <div id="toast-container"></div>
+
+    <!-- Interface Scripts -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    {% if session['user'] %}
+    <script>
+        // Reveal operative status once authenticated
+        const statusEl = document.getElementById('operativeStatus');
+        if (statusEl) statusEl.style.display = 'block';
+    </script>
+    {% endif %}
+
+</body>
+
+</html>
