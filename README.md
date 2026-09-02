@@ -51,3 +51,30 @@ StegaNSS/
 ├── style.css
 ├── script.js
 └── logo.png
+## ⚙️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/safana-cop/StegaNSS.git
+cd StegaNSS
+
+2. Install dependencies
+pip install -r requirements.txt
+
+3. Run the application
+python app.py
+Then open the local URL shown in the terminal.
+## 🎯 Objective
+
+The objective of StegaNSS is to provide a user-friendly platform for securely hiding and extracting confidential information using multimedia steganography techniques.
+
+## 🔮 Future Enhancements
+
+- Improved encryption and security
+- Support for larger multimedia files
+- Advanced steganalysis detection
+- Cloud-based secure storage
+- Enhanced authentication
+- Deployment as a web application
+
