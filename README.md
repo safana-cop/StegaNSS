@@ -48,7 +48,33 @@ StegaNSS/
 ├── style.css
 ├── script.js
 └── logo.png
+```
 
+
+
+**⚙️ Installation**
+
+**1. Clone the repository**  
+`git clone ...`
+
+**2. Install dependencies**  
+`pip install -r requirements.txt`
+
+**3. Run the application**  
+`python app.py`
+
+
+
+**🎯 Objective**
+
+...
+
+**🔮 Future Enhancements**
+
+- Improved encryption and security
+- Support for larger multimedia files
+- Advanced steganalysis detection
+- etc.
 
 
 
